@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Мой трекер книг</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="tracker-container">
+    <header>
+      <h1>Мой книжный трекер</h1>
+      <button class="btn-logout" onclick="logout()">Выход</button>
+    </header>
+
+    <!-- Кнопка "+" для добавления книги -->
+    <button class="btn-add" onclick="showAddForm()">+ Добавить книгу</button>
+
+    <!-- Форма добавления книги -->
+    <div id="addForm" style="display: none; margin-top: 20px;">
+      <h2>Добавить книгу</h2>
+      <form id="bookForm">
+        <label>Название книги: <input type="text" name="title" required></label>
+        <label>Автор: <input type="text" name="author" required></label>
+        <label>Начало чтения: <input type="date" name="startDate"></label>
+        <label>Конец чтения: <input type="date" name="endDate"></label>
+        <label>Жанр: <input type="text" name="genre"></label>
+        <label>
+          Оценка:
+          <div class="stars">
+            <input type="radio" name="rating" value="1" id="star1"><label for="star1">★</label>
+            <input type="radio" name="rating" value="2" id="star2"><label for="star2">★★</label>
+            <input type="radio" name="rating" value="3" id="star3"><label for="star3">★★★</label>
+            <input type="radio" name="rating" value="4" id="star4"><label for="star4">★★★★</label>
+            <input type="radio" name="rating" value="5" id="star5"><label for="star5">★★★★★</label>
+          </div>
+        </label>
+        <label>Год издания: <input type="number" name="year" min="1000" max="2030"></label>
+        <label>Тип:
+          <select name="type">
+            <option value="однотомник">Однотомник</option>
+            <option value="цикл">Цикл</option>
+            <option value="серия">Серия</option>
+          </select>
+        </label>
+        <button type="submit">Сохранить</button>
+        <button type="button" onclick="hideAddForm()">Отмена</button>
+      </form>
+    </div>
+
+    <!-- Список книг -->
+    <div id="booksList"></div>
+  </div>
+
+  <script>
+    let books = JSON.parse(localStorage.getItem('books')) || [];
+    const currentUser = localStorage.getItem('currentUser');
+
+    // Выход
+    function logout() {
+      localStorage.removeItem('currentUser');
+      window.location.href = 'index.html';
+    }
+
+    // Показать форму добавления
+    function showAddForm() {
+      document.getElementById('addForm').style.display = 'block';
+    }
+
+    // Скрыть форму добавления
+    function hideAddForm() {
+      document.getElementById('addForm').style.display = 'none';
+    }
+
+    // Обработка формы
+    document.getElementById('bookForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const formData = new FormData(this);
+      const book = {
+        title: formData.get('title'),
+        author: formData.get('author'),
+        startDate: formData.get('startDate'),
+        endDate: formData.get('endDate'),
+        genre: formData.get('genre'),
+        rating: formData.get('rating'),
+        year: formData.get('year'),
+        type: formData.get('type'),
+        userId: currentUser
+      };
+
+      books.push(book);
+      localStorage.setItem('books', JSON.stringify(books));
+
+      renderBooks();
+      hideAddForm();
+      this.reset();
+    });
+
+    // Отображение книг
+    function renderBooks() {
+      const list = document.getElementById('booksList');
+      list.innerHTML = '<h2>Мои книги</h2>';
+
+      const userBooks = books.filter(book => book.userId === currentUser);
+
+      userBooks.forEach(book => {
+        list.innerHTML += `
+          <div class="book-card">
+            <h3>${book.title}</h3>
+            <p><strong>Автор:</strong> ${book.author}</p>
+            <p><strong>Даты:</strong> ${book.startDate} – ${book.endDate || 'не закончена'}</p>
+            <p><strong>Жанр:</strong> ${book.genre}</p>
+            <p><strong>Оценка:</strong> ${book.rating} звёзд</p>
+            <p><strong>Год:</strong> ${book.year}</p>
+            <p><strong>Тип:</strong> ${book.type}</p>
+          </div>
+        `;
+      });
+    }
+
+    // Инициализация
+    if (!currentUser) {
+      window.location.href = 'index.html';
+    } else {
+      renderBooks();
+    }
+  </script>
+</body>
+</html>

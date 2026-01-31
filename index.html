@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Вход / Регистрация</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="auth-container">
+    <h1>Книжный трекер</h1>
+
+    <!-- Форма входа -->
+    <div id="loginForm">
+      <h2>Войти</h2>
+      <input type="text" id="loginUsername" placeholder="Имя пользователя" required>
+      <input type="password" id="loginPassword" placeholder="Пароль" required>
+      <button onclick="login()">Войти</button>
+      <p><a href="#" onclick="showRegisterForm()">Нет аккаунта? Зарегистрироваться</a></p>
+    </div>
+
+    <!-- Форма регистрации -->
+    <div id="registerForm" style="display: none;">
+      <h2>Регистрация</h2>
+      <input type="text" id="regUsername" placeholder="Имя пользователя" required>
+      <input type="password" id="regPassword" placeholder="Пароль" required>
+      <button onclick="register()">Зарегистрироваться</button>
+      <p><a href="#" onclick="showLoginForm()">Уже есть аккаунт? Войти</a></p>
+    </div>
+  </div>
+
+
+  <script>
+    // Переключение между формами
+    function showRegisterForm() {
+      document.getElementById('loginForm').style.display = 'none';
+      document.getElementById('registerForm').style.display = 'block';
+    }
+
+    function showLoginForm() {
+      document.getElementById('registerForm').style.display = 'none';
+      document.getElementById('loginForm').style.display = 'block';
+    }
+
+    // Регистрация
+    function register() {
+      const username = document.getElementById('regUsername').value;
+      const password = document.getElementById('regPassword').value;
+
+      if (username && password) {
+        localStorage.setItem('user_' + username, password);
+        alert('Регистрация успешна! Теперь войдите в аккаунт.');
+        showLoginForm();
+      } else {
+        alert('Заполните все поля!');
+      }
+    }
+
+    // Вход
+    function login() {
+      const username = document.getElementById('loginUsername').value;
+      const password = document.getElementById('loginPassword').value;
+
+      const storedPassword = localStorage.getItem('user_' + username);
+
+      if (storedPassword === password) {
+        localStorage.setItem('currentUser', username);
+        window.location.href = 'tracker.html';
+      } else {
+        alert('Неверный логин или пароль!');
+      }
+    }
+  </script>
+</body>
+</html>
